@@ -125,9 +125,73 @@
             padding: 40px 20px;
             font-size: 16px;
         }
+
+        /* Dark theme */
+        body.dark {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        body.dark .container {
+            background: #1e1e2e;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        body.dark h1 {
+            color: #e0e0e0;
+        }
+
+        body.dark #todoInput {
+            background: #2a2a3e;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+
+        body.dark #todoInput:focus {
+            border-color: #667eea;
+        }
+
+        body.dark #todoInput::placeholder {
+            color: #888;
+        }
+
+        body.dark .todo-item {
+            background: #2a2a3e;
+        }
+
+        body.dark .todo-item:hover {
+            background: #333350;
+        }
+
+        body.dark .todo-text {
+            color: #e0e0e0;
+        }
+
+        body.dark .empty-message {
+            color: #666;
+        }
+
+        /* Theme toggle button */
+        .theme-toggle {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 14px;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
     </style>
 </head>
 <body>
+    <button class="theme-toggle" id="themeToggle">🌙 Dark</button>
     <div class="container">
         <h1>📝 My Todo App</h1>
         
@@ -149,6 +213,20 @@
         const todoInput = document.getElementById('todoInput');
         const addBtn = document.getElementById('addBtn');
         const todoList = document.getElementById('todoList');
+        const themeToggle = document.getElementById('themeToggle');
+
+        // Load and apply saved theme
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+            themeToggle.textContent = '☀️ Light';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            themeToggle.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
 
         // Load todos from localStorage
         let todos = JSON.parse(localStorage.getItem('todos')) || [];
