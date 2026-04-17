@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待办事项应用</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <button id="themeToggle" class="theme-toggle" aria-label="切换主题">🌙</button>
+
+    <div class="container">
+        <h1>我的待办事项</h1>
+        
+        <div class="input-container">
+            <input 
+                type="text" 
+                id="todoInput" 
+                placeholder="输入一个新的待办事项..."
+                autocomplete="off"
+            >
+            <button id="addBtn" class="add-btn">添加</button>
+        </div>
+
+        <ul id="todoList" class="todo-list">
+            <!-- 待办事项将动态插入到这里 -->
+        </ul>
+
+        <div class="empty-state" id="emptyState">
+            <p>暂无待办事项，开始添加一个吧！</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
