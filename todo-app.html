@@ -5,6 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>待办事项</title>
   <style>
+    /* ── CSS custom properties for theming ── */
+    :root {
+      --bg: #f0f2f5;
+      --container-bg: #ffffff;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --heading: #1a1a2e;
+      --item-bg: #f8f9fb;
+      --item-hover: #eef0f8;
+      --text: #333;
+      --text-done: #aaa;
+      --input-border: #dde1e7;
+      --hint: #bbb;
+      --toggle-bg: #e2e8ff;
+      --toggle-color: #4f6ef7;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f1117;
+      --container-bg: #1c1f2e;
+      --shadow: rgba(0, 0, 0, 0.5);
+      --heading: #e8eaf6;
+      --item-bg: #252840;
+      --item-hover: #2e3254;
+      --text: #d0d3e8;
+      --text-done: #555;
+      --input-border: #3a3f5c;
+      --hint: #555;
+      --toggle-bg: #2e3254;
+      --toggle-color: #a5b4fc;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -13,28 +44,58 @@
 
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f2f5;
+      background: var(--bg);
       display: flex;
       justify-content: center;
       padding: 60px 16px;
       min-height: 100vh;
+      transition: background 0.3s;
     }
 
     .container {
-      background: #ffffff;
+      background: var(--container-bg);
       border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 20px var(--shadow);
       padding: 32px;
       width: 100%;
       max-width: 480px;
       height: fit-content;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      position: relative;
     }
 
     h1 {
       font-size: 1.8rem;
-      color: #1a1a2e;
-      margin-bottom: 24px;
-      text-align: center;
+      color: var(--heading);
+    }
+
+    /* ── Theme toggle button ── */
+    #theme-toggle {
+      position: absolute;
+      right: 0;
+      background: var(--toggle-bg);
+      border: none;
+      border-radius: 20px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: var(--toggle-color);
+      transition: background 0.3s, color 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    #theme-toggle:hover {
+      filter: brightness(0.9);
     }
 
     .input-row {
@@ -46,11 +107,13 @@
     .input-row input {
       flex: 1;
       padding: 10px 14px;
-      border: 2px solid #dde1e7;
+      border: 2px solid var(--input-border);
       border-radius: 8px;
       font-size: 1rem;
       outline: none;
-      transition: border-color 0.2s;
+      background: var(--container-bg);
+      color: var(--text);
+      transition: border-color 0.2s, background 0.3s, color 0.3s;
     }
 
     .input-row input:focus {
@@ -82,19 +145,19 @@
       align-items: center;
       gap: 10px;
       padding: 12px 14px;
-      background: #f8f9fb;
+      background: var(--item-bg);
       border-radius: 8px;
       margin-bottom: 10px;
       transition: background 0.15s;
     }
 
     #todo-list li:hover {
-      background: #eef0f8;
+      background: var(--item-hover);
     }
 
     #todo-list li.done .todo-text {
       text-decoration: line-through;
-      color: #aaa;
+      color: var(--text-done);
     }
 
     #todo-list li input[type="checkbox"] {
@@ -108,8 +171,9 @@
     .todo-text {
       flex: 1;
       font-size: 1rem;
-      color: #333;
+      color: var(--text);
       word-break: break-word;
+      transition: color 0.3s;
     }
 
     .delete-btn {
@@ -130,7 +194,7 @@
 
     .empty-hint {
       text-align: center;
-      color: #bbb;
+      color: var(--hint);
       font-size: 0.95rem;
       padding: 20px 0;
     }
@@ -138,7 +202,10 @@
 </head>
 <body>
   <div class="container">
-    <h1>📝 待办事项</h1>
+    <div class="header">
+      <h1>📝 待办事项</h1>
+      <button id="theme-toggle" title="切换主题">🌙 深色</button>
+    </div>
     <div class="input-row">
       <input
         type="text"
@@ -154,6 +221,29 @@
   </div>
 
   <script>
+    // ── Theme toggle ──
+    const themeToggle = document.getElementById("theme-toggle");
+    const THEME_KEY = "todo-theme";
+
+    function applyTheme(dark) {
+      document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+      themeToggle.textContent = dark ? "☀️ 浅色" : "🌙 深色";
+      localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
+    }
+
+    // Load saved preference; fall back to OS preference
+    const saved = localStorage.getItem(THEME_KEY);
+    const prefersDark = saved
+      ? saved === "dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    applyTheme(prefersDark);
+
+    themeToggle.addEventListener("click", () => {
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      applyTheme(!isDark);
+    });
+
+    // ── To-do list ──
     const input = document.getElementById("todo-input");
     const addBtn = document.getElementById("add-btn");
     const list = document.getElementById("todo-list");
