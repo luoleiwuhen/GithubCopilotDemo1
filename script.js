@@ -194,4 +194,52 @@ class TodoApp {
 // 页面加载完成后初始化应用
 document.addEventListener('DOMContentLoaded', () => {
     new TodoApp();
+    initStars();
 });
+
+function initStars() {
+    const container = document.getElementById('starContainer');
+    const CHARS = ['★', '✦', '✧', '✩', '⭐'];
+
+    function spawnStar() {
+        const star = document.createElement('span');
+        star.className = 'star';
+        star.textContent = CHARS[Math.floor(Math.random() * CHARS.length)];
+
+        const size = 10 + Math.random() * 14;
+        const startX = Math.random() * window.innerWidth;
+        const startY = Math.random() * window.innerHeight;
+        const angle = (Math.random() * 60 - 30) * (Math.PI / 180); // -30° to +30° from horizontal
+        const dist = 220 + Math.random() * 280;
+        const dx = Math.cos(angle) * dist * (Math.random() < 0.5 ? 1 : -1);
+        const dy = Math.sin(angle) * dist;
+        const duration = 1.2 + Math.random() * 1.6;
+
+        star.style.cssText = `
+            left: ${startX}px;
+            top: ${startY}px;
+            font-size: ${size}px;
+            --dx: ${dx}px;
+            --dy: ${dy}px;
+            animation-duration: ${duration}s;
+        `;
+
+        container.appendChild(star);
+        star.addEventListener('animationend', () => star.remove(), { once: true });
+    }
+
+    // Spawn stars at random intervals
+    function scheduleNext() {
+        const delay = 400 + Math.random() * 900;
+        setTimeout(() => {
+            spawnStar();
+            scheduleNext();
+        }, delay);
+    }
+
+    // Launch a few immediately on load
+    for (let i = 0; i < 3; i++) {
+        setTimeout(spawnStar, i * 250);
+    }
+    scheduleNext();
+}
